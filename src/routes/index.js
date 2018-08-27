@@ -13,7 +13,7 @@ const routes = [
       {
         path: '/',
         exact: true,
-        component: Imported(() => import('@/views/Home/Home'))
+        component: Imported(() => import('@/views/XLayout/XLayout'))
       },
       {
         path: '/Message',
