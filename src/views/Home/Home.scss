@@ -1,4 +1,12 @@
 .home {
   height: 100%;
-  color: red;
+  background-color: #fff;
+  padding: 0 24px 16px 24px;
+  .gutter-row {
+    padding: 8px;
+  }
+  .cover-img {
+    height: 230px;
+    object-fit: cover;
+  }
 }

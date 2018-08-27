@@ -1,21 +1,50 @@
 import React from 'react'
-// import style from './XLayout.scss'
-import { Layout, Menu, Icon } from 'antd'
+import style from './XLayout.scss'
+import {
+  Layout,
+  Menu,
+  Icon,
+  Card,
+  Avatar,
+  Divider,
+  Tag,
+  Row,
+  Col,
+  Dropdown,
+  Calendar
+} from 'antd'
 import Home from '../Home/Home'
 import Message from '../Message/Message'
 import About from '../About/About'
-const { Header, Content, Footer, Sider } = Layout
+const { Meta } = Card
+const { Header, Content, Footer } = Layout
+
 class XLayout extends React.Component {
   state = {
-    current: 'home'
+    current: 'home',
+    tags: ['很有想法的', '专注前端'],
+    colors: [
+      'magenta',
+      'red',
+      'volcano',
+      'orange',
+      'gold',
+      'green',
+      'cyan',
+      'blue',
+      'geekblue',
+      'purple'
+    ]
   }
-
+  componentDidMount() {}
   handleClick = e => {
     this.setState({
       current: e.key
     })
   }
-
+  onPanelChange(value, mode) {
+    console.log(value, mode)
+  }
   getComponent = () => {
     switch (this.state.current) {
       case 'about':
@@ -34,57 +63,101 @@ class XLayout extends React.Component {
 
   render() {
     return (
-      <Layout>
-        <Sider
-          breakpoint="lg"
-          collapsedWidth="0"
-          onBreakpoint={broken => {
-            console.log(broken)
-          }}
-          onCollapse={(collapsed, type) => {
-            console.log(collapsed, type)
-          }}
-        >
-          <div className="logo" />
-          <Menu theme="dark" mode="inline" defaultSelectedKeys={['4']}>
-            <Menu.Item key="1">
-              <Icon type="user" />
-              <span className="nav-text">nav 1</span>
-            </Menu.Item>
-            <Menu.Item key="2">
-              <Icon type="video-camera" />
-              <span className="nav-text">nav 2</span>
-            </Menu.Item>
-            <Menu.Item key="3">
-              <Icon type="upload" />
-              <span className="nav-text">nav 3</span>
-            </Menu.Item>
-            <Menu.Item key="4">
-              <Icon type="user" />
-              <span className="nav-text">nav 4</span>
-            </Menu.Item>
-          </Menu>
-        </Sider>
+      <Layout className={style.layout}>
         <Layout>
-          <Header style={{ background: '#fff', padding: 0 }}>
+          <Header className={style.header}>
             <Menu
               onClick={this.handleClick}
               selectedKeys={[this.state.current]}
               mode="horizontal"
+              theme="dark"
+              className={style.menu}
             >
-              <Menu.Item key="home">
+              <Menu.Item key="home" className={style['menu-item']}>
                 <Icon type="appstore" />
                 首页
               </Menu.Item>
-              <Menu.Item key="message">
+              <Menu.Item key="message" className={style['menu-item']}>
                 <Icon type="mail" />
                 留言
               </Menu.Item>
-              <Menu.Item key="about">关于</Menu.Item>
+              <Menu.Item key="about" className={style['menu-item']}>
+                关于
+              </Menu.Item>
+              <Menu.Item
+                key="user"
+                className={[style['menu-item'], style['menu-user']]}
+              >
+                <Dropdown
+                  overlay={
+                    <Menu>
+                      <Menu.Item>
+                        <Icon type="user" />
+                        个人中心
+                      </Menu.Item>
+                      <Menu.Item>
+                        <Icon type="logout" />
+                        退出登录
+                      </Menu.Item>
+                    </Menu>
+                  }
+                >
+                  <a className="ant-dropdown-link" href="#">
+                    <Avatar
+                      src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                      style={{ marginRight: '5px' }}
+                    />
+                    我是你鸡哥
+                  </a>
+                </Dropdown>
+              </Menu.Item>
             </Menu>
           </Header>
-          <Content style={{ margin: '24px 16px 0' }}>
-            {this.getComponent()}
+          <Content className={style.content}>
+            <Row gutter={48}>
+              <Col className="gutter-row" span={6}>
+                <Card
+                  className={style.card}
+                  cover={
+                    <img
+                      alt="example"
+                      src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
+                    />
+                  }
+                >
+                  <Meta
+                    avatar={
+                      <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                    }
+                    title="Ji_Brother"
+                    description="JUST DO IT"
+                  />
+                  <Divider dashed={true} />
+                  <Meta
+                    title="标签"
+                    description={this.state.tags.map((item, index) => (
+                      <Tag
+                        color={
+                          this.state.colors[Math.floor(Math.random() * 10 + 1)]
+                        }
+                        key={index}
+                      >
+                        {item}
+                      </Tag>
+                    ))}
+                  />
+                </Card>
+                <Card className={style.card}>
+                  <Calendar
+                    fullscreen={false}
+                    onPanelChange={this.onPanelChange}
+                  />
+                </Card>
+              </Col>
+              <Col className="gutter-row" span={18}>
+                {this.getComponent()}
+              </Col>
+            </Row>
           </Content>
           <Footer style={{ textAlign: 'center' }}>
             Ant Design ©2018 Created by Ant UED
