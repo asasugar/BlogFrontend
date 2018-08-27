@@ -156,13 +156,30 @@ module.exports = {
           // In production, we use a plugin to extract that CSS to a file, but
           // in development "style" loader enables hot editing of CSS.
           {
+            //antd样式处理
+            test: /\.css$/,
+            exclude: /src/,
+            use: [
+              { loader: 'style-loader' },
+              {
+                loader: 'css-loader',
+                options: {
+                  importLoaders: 1
+                }
+              }
+            ]
+          },
+          {
             test: /\.(css|scss|sass)$/,
+            exclude: [/node_modules/],
             use: [
               require.resolve('style-loader'),
               {
                 loader: require.resolve('css-loader'),
                 options: {
-                  importLoaders: 1
+                  importLoaders: 1,
+                  modules: true,
+                  localIdentName: '[name]__[local]__[hash:base64:5]'
                 }
               },
               {
