@@ -1,7 +1,6 @@
 import React from 'react'
-import { Tabs, List, Avatar, Icon, Row, Col, Card } from 'antd'
+import { Tabs, List, Avatar, Icon, Card } from 'antd'
 import style from './Home.scss'
-import request from '@/utils/request'
 const TabPane = Tabs.TabPane
 const { Meta } = Card
 class Home extends React.Component {
