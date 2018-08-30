@@ -1,13 +1,11 @@
 import React, { Component } from 'react'
-import { renderRoutes } from 'react-router-config'
-import { BrowserRouter } from 'react-router-dom'
-import routes from '@/routes/index'
+import XLayout from '../src/views/XLayout/XLayout'
 
 class App extends Component {
   render() {
     return (
       <div className="App">
-        <BrowserRouter>{renderRoutes(routes)}</BrowserRouter>
+        <XLayout />
       </div>
     )
   }

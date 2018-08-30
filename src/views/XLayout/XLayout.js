@@ -1,4 +1,7 @@
 import React from 'react'
+import { renderRoutes } from 'react-router-config'
+import { BrowserRouter } from 'react-router-dom'
+import routes from '@/routes/index'
 import style from './XLayout.scss'
 import {
   Layout,
@@ -16,12 +19,8 @@ import {
   Modal,
   Button,
   Form,
-  Input,
-  Checkbox
+  Input
 } from 'antd'
-import Home from '../Home/Home'
-import Message from '../Message/Message'
-import About from '../About/About'
 import request from '@/utils/request'
 
 const { Meta } = Card
@@ -45,11 +44,25 @@ class XLayout extends React.Component {
       'purple'
     ],
     userInfo: null,
+    myInfo: {},
     visible: false,
     loading: false,
     modalTitle: null
   }
-  componentDidMount() {}
+  async componentWillMount() {
+    // 相当于vue的created
+    const { data } = await request({
+      data: { userId: 1 },
+      url: '/getUser'
+    })
+    if (data.success) {
+      this.setState({ myInfo: data.data })
+    }
+    console.log(this.state.myInfo)
+  }
+  async componentDidMount() {
+    // 相当于vue的mouted
+  }
 
   handleClick = e => {
     this.setState({
@@ -89,22 +102,6 @@ class XLayout extends React.Component {
     console.log(value, mode)
   }
 
-  getComponent = () => {
-    switch (this.state.current) {
-      case 'about':
-        return <About />
-        break
-
-      case 'message':
-        return <Message />
-        break
-
-      default:
-        return <Home />
-        break
-    }
-  }
-
   login = async values => {
     this.setState({ loading: true })
 
@@ -121,6 +118,7 @@ class XLayout extends React.Component {
         userInfo: data.data,
         visible: false
       })
+      this.props.form.resetFields()
       message.success('登录成功')
     } else message.error(data.msg)
   }
@@ -140,6 +138,7 @@ class XLayout extends React.Component {
       this.setState({
         visible: false
       })
+      this.props.form.resetFields()
       message.success('注册成功')
     } else message.error(data.msg)
   }
@@ -159,6 +158,7 @@ class XLayout extends React.Component {
       this.setState({
         visible: false
       })
+      this.props.form.resetFields()
       message.success('修改成功')
     } else message.error(data.msg)
   }
@@ -375,6 +375,52 @@ class XLayout extends React.Component {
                 ) : (
                   ''
                 )}
+                {this.state.modalTitle === '注册' ? (
+                  <div>
+                    <FormItem hasFeedback={true}>
+                      {getFieldDecorator('userName', {
+                        rules: [
+                          {
+                            required: true,
+                            message: 'Please input your userName!'
+                          }
+                        ]
+                      })(
+                        <Input
+                          prefix={
+                            <Icon
+                              type="smile-o"
+                              style={{ color: 'rgba(0,0,0,.25)' }}
+                            />
+                          }
+                          placeholder="UserName"
+                        />
+                      )}
+                    </FormItem>
+                    <FormItem hasFeedback={true}>
+                      {getFieldDecorator('remark', {
+                        rules: [
+                          {
+                            required: true,
+                            message: 'Please input your remark!'
+                          }
+                        ]
+                      })(
+                        <Input
+                          prefix={
+                            <Icon
+                              type="edit"
+                              style={{ color: 'rgba(0,0,0,.25)' }}
+                            />
+                          }
+                          placeholder="Remark"
+                        />
+                      )}
+                    </FormItem>
+                  </div>
+                ) : (
+                  ''
+                )}
               </Form>
             </Modal>
             <Row gutter={48}>
@@ -389,11 +435,9 @@ class XLayout extends React.Component {
                   }
                 >
                   <Meta
-                    avatar={
-                      <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
-                    }
-                    title="Ji_Brother"
-                    description="JUST DO IT"
+                    avatar={<Avatar src={this.state.myInfo.headImg} />}
+                    title={this.state.myInfo.userName}
+                    description={this.state.myInfo.remark}
                   />
                   <Divider dashed={true} />
                   <Meta
@@ -418,7 +462,7 @@ class XLayout extends React.Component {
                 </Card>
               </Col>
               <Col className="gutter-row" span={18}>
-                {this.getComponent()}
+                <BrowserRouter>{renderRoutes(routes)}</BrowserRouter>
               </Col>
             </Row>
           </Content>
