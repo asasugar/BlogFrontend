@@ -1,5 +1,5 @@
 import React from 'react'
-import { Tabs, List, Avatar, Icon, Card } from 'antd'
+import { Tabs, List, Avatar, Icon, Card, Button } from 'antd'
 import style from './Home.scss'
 const TabPane = Tabs.TabPane
 const { Meta } = Card
@@ -122,7 +122,14 @@ class Home extends React.Component {
     )
   }
   render() {
-    return <div className={style.home}>{this._renderList()}</div>
+    return (
+      <div className={style.home}>
+        {this._renderList()}
+        <Button type="primary" className={style.write}>
+          写文章
+        </Button>
+      </div>
+    )
   }
 }
 

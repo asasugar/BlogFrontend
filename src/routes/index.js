@@ -16,6 +16,11 @@ const routes = [
         component: Imported(() => import('@/views/Home/Home'))
       },
       {
+        path: '/AddArticle',
+        exact: true,
+        component: Imported(() => import('@/views/Article/AddArticle'))
+      },
+      {
         path: '/About',
         exact: true,
         component: Imported(() => import('@/views/About/About'))

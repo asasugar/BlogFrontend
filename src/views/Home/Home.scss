@@ -2,11 +2,17 @@
   height: 100%;
   background-color: #fff;
   padding: 0 24px 16px 24px;
+  position: relative;
   .gutter-row {
     padding: 8px;
   }
   .cover-img {
     height: 230px;
     object-fit: cover;
+  }
+  .write {
+    position: absolute;
+    top: 6px;
+    right: 24px;
   }
 }
