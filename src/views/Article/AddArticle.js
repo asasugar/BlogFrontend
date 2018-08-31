@@ -29,7 +29,12 @@ class AddArticle extends React.Component {
     super(props)
     this.state = {
       aceBoxH: null,
-      previewContent: ''
+      previewContent: '',
+      form: {
+        title: '',
+        content: '',
+        coverImg: ''
+      }
     }
     this.cacheValue()
     this.containerScroll = this.containerScroll.bind(this)
@@ -67,8 +72,12 @@ class AddArticle extends React.Component {
   }
 
   onContentChange(e) {
-    console.log(marked(e.target.innerText))
+    console.log(e.target.innerText)
+    let form = Object.assign({}, this.state.form, {
+      content: e.target.innerText
+    })
     this.setState({
+      form,
       previewContent: marked(e.target.innerText)
     })
     !this.hasContentChanged && (this.hasContentChanged = true)

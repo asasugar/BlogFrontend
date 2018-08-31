@@ -179,8 +179,8 @@
   .edit-header {
     position: relative;
     height: 64px;
-    padding: 0 18px;
     border-bottom: 1px solid #ddd;
+    background-color: #fff;
   }
   .edit-header .title-input {
     height: 100%;
@@ -188,6 +188,7 @@
     font-size: 24px;
     font-weight: 700;
     color: #000;
+    padding: 0 18px;
     border: none;
     outline: none;
   }
@@ -340,7 +341,7 @@ Gruvbox style (dark) (c) Pavel Pertsev (original style at https://github.com/mor
     border-top: none;
   }
   .editor-main-a .common-container .common-wrapper {
-    padding: 20px;
+    padding: 20px 0 0 20px;
     min-height: 100%;
     outline: none;
   }
