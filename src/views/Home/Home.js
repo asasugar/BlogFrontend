@@ -1,6 +1,8 @@
 import React from 'react'
 import { Tabs, List, Avatar, Icon, Card, Button } from 'antd'
 import style from './Home.scss'
+import request from '@/utils/request'
+
 const TabPane = Tabs.TabPane
 const { Meta } = Card
 class Home extends React.Component {
@@ -16,20 +18,9 @@ class Home extends React.Component {
       </span>
     )
   }
-  componentWillMount() {
-    let articleList = []
+  async componentWillMount() {
     let projectList = []
     for (let i = 0; i < 23; i++) {
-      articleList.push({
-        href: 'http://ant.design',
-        title: `ant design part ${i}`,
-        avatar:
-          'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-        description:
-          'Ant Design, a design language for background applications, is refined by Ant UED Team.',
-        content:
-          'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.'
-      })
       projectList.push({
         alt: 'example',
         avatar: 'https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png',
@@ -37,7 +28,14 @@ class Home extends React.Component {
         description: 'www.instagram.com'
       })
     }
-    this.setState({ articleList, projectList })
+    this.setState({ projectList })
+    const { data } = await request({
+      url: '/getArticleList'
+    })
+
+    if (data.success) {
+      this.setState({ articleList: data.data })
+    }
   }
   changeTab(key) {
     console.log(key)
@@ -64,18 +62,11 @@ class Home extends React.Component {
                   this._renderIconText({ type: 'like-o', text: 152 }),
                   this._renderIconText({ type: 'message', text: 2 })
                 ]}
-                extra={
-                  <img
-                    width={272}
-                    alt="logo"
-                    src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-                  />
-                }
+                extra={<img width={272} alt="logo" src={item.coverImg} />}
               >
                 <List.Item.Meta
-                  avatar={<Avatar src={item.avatar} />}
+                  avatar={<Avatar src={item.coverImg} />}
                   title={<a href={item.href}>{item.title}</a>}
-                  description={item.description}
                 />
                 {item.content}
               </List.Item>
@@ -112,7 +103,7 @@ class Home extends React.Component {
                     />
                   }
                 >
-                  <Meta title={item.title} description={item.description} />
+                  <Meta title={item.title} description={item.content} />
                 </Card>
               </List.Item>
             )}
@@ -125,7 +116,11 @@ class Home extends React.Component {
     return (
       <div className={style.home}>
         {this._renderList()}
-        <Button type="primary" className={style.write}>
+        <Button
+          type="primary"
+          className={style.write}
+          onClick={() => this.props.history.push('/AddArticle')}
+        >
           写文章
         </Button>
       </div>

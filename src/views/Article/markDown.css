@@ -333,6 +333,7 @@ Gruvbox style (dark) (c) Pavel Pertsev (original style at https://github.com/mor
   .editor-main-a {
     display: flex;
     flex: 1;
+    height: 620px !important;
   }
   .editor-main-a .common-container {
     width: 50%;

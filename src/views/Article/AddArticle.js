@@ -1,8 +1,10 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import marked from 'marked'
 import highlight from 'highlight.js/lib/highlight'
 import './markDown.css'
+import request from '@/utils/request'
+
+import { Button, message } from 'antd'
 highlight.configure({
   tabReplace: '  ',
   classPrefix: 'hljs-',
@@ -30,6 +32,7 @@ class AddArticle extends React.Component {
     this.state = {
       aceBoxH: null,
       previewContent: '',
+      loading: false,
       form: {
         title: '',
         content: '',
@@ -39,6 +42,7 @@ class AddArticle extends React.Component {
     this.cacheValue()
     this.containerScroll = this.containerScroll.bind(this)
     this.onContentChange = this.onContentChange.bind(this)
+    this.handleChange = this.handleChange.bind(this)
   }
   componentDidMount() {
     this.setState({
@@ -70,6 +74,14 @@ class AddArticle extends React.Component {
         this.previewContainer.scrollTop / this.scale
     }
   }
+  handleChange(e) {
+    let form = Object.assign({}, this.state.form, {
+      title: e.target.value
+    })
+    this.setState({
+      form
+    })
+  }
 
   onContentChange(e) {
     console.log(e.target.innerText)
@@ -90,6 +102,16 @@ class AddArticle extends React.Component {
       (this.editWrap.offsetHeight - this.editContainer.offsetHeight)
     this.hasContentChanged = false
   }
+  save = async () => {
+    const { data } = await request({
+      data: this.state.form,
+      url: '/addArticle',
+      method: 'post'
+    })
+    if (data.success) {
+      message.success(data.msg)
+    }
+  }
   render() {
     let state = this.state
     return (
@@ -100,6 +122,8 @@ class AddArticle extends React.Component {
             className="title-input"
             placeholder="输入文章标题..."
             spellCheck="false"
+            value={this.state.form.title}
+            onChange={this.handleChange}
           />
         </header>
 
@@ -137,6 +161,9 @@ class AddArticle extends React.Component {
             />
           </div>
         </div>
+        <Button type="primary" loading={this.state.loading} onClick={this.save}>
+          保存
+        </Button>
       </div>
     )
   }
