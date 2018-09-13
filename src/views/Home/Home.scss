@@ -15,4 +15,20 @@
     top: 6px;
     right: 24px;
   }
+  .item {
+    position: relative;
+    .delete {
+      position: absolute;
+      top: 30%;
+      cursor: pointer;
+      right: 20px;
+      cursor: pointer;
+      &:hover {
+        color: #f5222d;
+      }
+      &::before {
+        font-size: 16px;
+      }
+    }
+  }
 }

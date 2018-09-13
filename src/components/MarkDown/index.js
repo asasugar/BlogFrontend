@@ -2,9 +2,7 @@ import React from 'react'
 import marked from 'marked'
 import highlight from 'highlight.js/lib/highlight'
 import './markDown.css'
-import request from '@/utils/request'
 
-import { Button, message } from 'antd'
 highlight.configure({
   tabReplace: '  ',
   classPrefix: 'hljs-',
@@ -26,13 +24,12 @@ marked.setOptions({
     return highlight.highlightAuto(code).value
   }
 })
-class AddArticle extends React.Component {
+class MarkDown extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       aceBoxH: null,
       previewContent: '',
-      loading: false,
       form: {
         title: '',
         content: '',
@@ -86,7 +83,7 @@ class AddArticle extends React.Component {
   onContentChange(e) {
     console.log(e.target.innerText)
     let form = Object.assign({}, this.state.form, {
-      content: e.target.innerText
+      content: marked(e.target.innerText)
     })
     this.setState({
       form,
@@ -102,16 +99,7 @@ class AddArticle extends React.Component {
       (this.editWrap.offsetHeight - this.editContainer.offsetHeight)
     this.hasContentChanged = false
   }
-  save = async () => {
-    const { data } = await request({
-      data: this.state.form,
-      url: '/addArticle',
-      method: 'post'
-    })
-    if (data.success) {
-      message.success(data.msg)
-    }
-  }
+
   render() {
     let state = this.state
     return (
@@ -161,12 +149,9 @@ class AddArticle extends React.Component {
             />
           </div>
         </div>
-        <Button type="primary" loading={this.state.loading} onClick={this.save}>
-          保存
-        </Button>
       </div>
     )
   }
 }
 
-export default AddArticle
+export default MarkDown

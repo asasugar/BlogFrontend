@@ -2,9 +2,10 @@ import axios from 'axios'
 import qs from 'qs'
 axios.defaults.withCredentials = true
 const request = ({ method = 'get', url, data = {} }, otherConfig = {}) => {
+  url = /http/.test(url) ? url : `http://192.168.7.77:7001/blog${url}`
   let config = {
     method,
-    url: `http://127.0.0.1:7001/blog${url}`,
+    url,
     [method === 'get' ? 'params' : 'data']:
       method === 'get' ? data : qs.stringify(data),
     headers: {

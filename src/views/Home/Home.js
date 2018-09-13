@@ -1,8 +1,10 @@
 import React from 'react'
-import { Tabs, List, Avatar, Icon, Card, Button } from 'antd'
+import { Tabs, List, Icon, Card, Button, message, Modal } from 'antd'
 import style from './Home.scss'
 import request from '@/utils/request'
-
+import { isPower } from '@/utils'
+import { getLocalStorage } from '@/utils/localStorage'
+const confirm = Modal.confirm
 const TabPane = Tabs.TabPane
 const { Meta } = Card
 class Home extends React.Component {
@@ -19,6 +21,7 @@ class Home extends React.Component {
     )
   }
   async componentWillMount() {
+    this.getList()
     let projectList = []
     for (let i = 0; i < 23; i++) {
       projectList.push({
@@ -29,17 +32,67 @@ class Home extends React.Component {
       })
     }
     this.setState({ projectList })
+  }
+  changeTab(key) {
+    console.log(key)
+  }
+  getList = async () => {
     const { data } = await request({
       url: '/getArticleList'
     })
 
     if (data.success) {
+      // let articleList = data.data.map(item => {
+      //   if (!item.coverImg) {
+      //     // 默认图片
+      //     item.coverImg =
+      //       'https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png'
+      //   }
+      //   return item
+      // })
       this.setState({ articleList: data.data })
     }
   }
-  changeTab(key) {
-    console.log(key)
+  // 到详情
+  goDetail = info => {
+    this.props.history.push('/ArticleDetail', info)
   }
+  // 删除
+  deleteArticle = id => {
+    confirm({
+      title: 'Do you want to delete?',
+      onOk: async () => {
+        const { data } = await request({
+          url: '/deleteArticle',
+          data: { articleId: id },
+          method: 'post'
+        })
+        if (data.success) {
+          message.success(data.msg)
+          this.getList()
+        }
+      },
+      onCancel() {
+        message.warning('Cancel')
+      }
+    })
+  }
+  // 是否显示删除按钮
+  _renderDeleteIcon = articleId => {
+    if (getLocalStorage('userInfo')) {
+      let r = isPower(JSON.parse(getLocalStorage('userInfo')))
+      if (r) {
+        return (
+          <Icon
+            type="delete"
+            className={style.delete}
+            onClick={() => this.deleteArticle(articleId)}
+          />
+        )
+      }
+    }
+  }
+
   _renderList = () => {
     return (
       <Tabs onChange={this.changeTab} type="line">
@@ -51,25 +104,28 @@ class Home extends React.Component {
               onChange: page => {
                 console.log(page)
               },
-              pageSize: 3
+              pageSize: 5
             }}
             dataSource={this.state.articleList}
             renderItem={item => (
-              <List.Item
-                key={item.title}
-                actions={[
-                  this._renderIconText({ type: 'star-o', text: 156 }),
-                  this._renderIconText({ type: 'like-o', text: 152 }),
-                  this._renderIconText({ type: 'message', text: 2 })
-                ]}
-                extra={<img width={272} alt="logo" src={item.coverImg} />}
-              >
-                <List.Item.Meta
-                  avatar={<Avatar src={item.coverImg} />}
-                  title={<a href={item.href}>{item.title}</a>}
-                />
-                {item.content}
-              </List.Item>
+              <div className={style.item}>
+                {this._renderDeleteIcon(item.articleId)}
+                <List.Item
+                  onClick={() => this.goDetail(item)}
+                  key={item.title}
+                  actions={[
+                    this._renderIconText({ type: 'star-o', text: 156 }),
+                    this._renderIconText({ type: 'like-o', text: 152 }),
+                    this._renderIconText({ type: 'message', text: 2 })
+                  ]}
+                  // extra={<img width={272} alt="logo" src={item.coverImg} />}
+                >
+                  <List.Item.Meta
+                    title={<a href={item.href}>{item.title}</a>}
+                  />
+                  {/* {item.content} */}
+                </List.Item>
+              </div>
             )}
           />
         </TabPane>
@@ -119,7 +175,10 @@ class Home extends React.Component {
         <Button
           type="primary"
           className={style.write}
-          onClick={() => this.props.history.push('/AddArticle')}
+          onClick={() => {
+            console.log(this)
+            this.props.history.push('/AddArticle')
+          }}
         >
           写文章
         </Button>

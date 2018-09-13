@@ -1,6 +1,6 @@
 import React from 'react'
 import { renderRoutes } from 'react-router-config'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, Link } from 'react-router-dom'
 import routes from '@/routes/index'
 import style from './XLayout.scss'
 import {
@@ -22,6 +22,11 @@ import {
   Input
 } from 'antd'
 import request from '@/utils/request'
+import {
+  setLocalStorage,
+  getLocalStorage,
+  clearStorage
+} from '@/utils/localStorage'
 
 const { Meta } = Card
 const { Header, Content, Footer } = Layout
@@ -58,7 +63,9 @@ class XLayout extends React.Component {
     if (data.success) {
       this.setState({ myInfo: data.data })
     }
-    console.log(this.state.myInfo)
+    if (getLocalStorage('userInfo')) {
+      this.setState({ userInfo: JSON.parse(getLocalStorage('userInfo')) })
+    }
   }
   async componentDidMount() {
     // 相当于vue的mouted
@@ -83,6 +90,7 @@ class XLayout extends React.Component {
           userInfo: null
         })
         message.success('Success')
+        clearStorage()
       },
       onCancel() {
         message.warning('Cancel')
@@ -114,6 +122,8 @@ class XLayout extends React.Component {
       this.setState({ loading: false })
     }, 1500)
     if (data.success) {
+      // 将登录信息存储localStory
+      setLocalStorage('userInfo', JSON.stringify(data.data))
       this.setState({
         userInfo: data.data,
         visible: false
@@ -180,297 +190,313 @@ class XLayout extends React.Component {
   render() {
     const { getFieldDecorator } = this.props.form
     return (
-      <Layout className={style.layout}>
-        <Layout>
-          <Header className={style.header}>
-            <Menu
-              onClick={this.handleClick}
-              selectedKeys={[this.state.current]}
-              mode="horizontal"
-              theme="dark"
-              className={style.menu}
-            >
-              <Menu.Item key="home" className={style['menu-item']}>
-                <Icon type="appstore" />
-                首页
-              </Menu.Item>
-              <Menu.Item key="message" className={style['menu-item']}>
-                <Icon type="mail" />
-                留言
-              </Menu.Item>
-              <Menu.Item key="about" className={style['menu-item']}>
-                关于
-              </Menu.Item>
-
-              <Menu.Item
-                key="reg"
-                className={[style['menu-item'], style['menu-user']]}
-                onClick={this.loginOrRegOrForgot.bind(this, 'reg')}
+      <BrowserRouter>
+        <Layout className={style.layout}>
+          <Layout>
+            <Header className={style.header}>
+              <Menu
+                onClick={this.handleClick}
+                selectedKeys={[this.state.current]}
+                mode="horizontal"
+                theme="dark"
+                className={style.menu}
               >
-                注册
-              </Menu.Item>
-              {this.state.userInfo ? (
-                <Menu.Item
-                  key="user"
-                  className={[style['menu-item'], style['menu-user']]}
-                >
-                  <Dropdown
-                    overlay={
-                      <Menu>
-                        <Menu.Item>
-                          <Icon type="user" />
-                          个人中心
-                        </Menu.Item>
-                        <Menu.Item onClick={this.signOut}>
-                          <Icon type="logout" />
-                          退出登录
-                        </Menu.Item>
-                      </Menu>
-                    }
-                  >
-                    <a className="ant-dropdown-link" href="#">
-                      <Avatar
-                        src={this.state.userInfo.headImg}
-                        style={{ marginRight: '5px' }}
-                      />
-                      {this.state.userInfo.userName}
-                    </a>
-                  </Dropdown>
+                <Menu.Item key="home" className={style['menu-item']}>
+                  <Link to="/">
+                    <Icon type="appstore" />
+                    首页
+                  </Link>
                 </Menu.Item>
-              ) : (
-                <Menu.Item
-                  key="login"
-                  className={[style['menu-item'], style['menu-user']]}
-                  onClick={this.loginOrRegOrForgot.bind(this, 'login')}
-                >
-                  <Icon type="login" />
-                  登录
-                </Menu.Item>
-              )}
-            </Menu>
-          </Header>
-          <Content className={style.content}>
-            <Modal
-              visible={this.state.visible}
-              title={this.state.modalTitle}
-              onOk={this.handleSubmit}
-              onCancel={this.handleCancel}
-              footer={[
-                <Button key="back" onClick={this.handleCancel}>
-                  返回
-                </Button>,
-                <Button
-                  key="submit"
-                  type="primary"
-                  loading={this.state.loading}
-                  onClick={this.handleSubmit}
-                >
-                  确定
-                </Button>
-              ]}
-            >
-              <Form onSubmit={this.handleSubmit} className="login-form">
-                <FormItem hasFeedback={true}>
-                  {getFieldDecorator('account', {
-                    rules: [
-                      { required: true, message: 'Please input your account!' }
-                    ]
-                  })(
-                    <Input
-                      prefix={
-                        <Icon
-                          type="user"
-                          style={{ color: 'rgba(0,0,0,.25)' }}
-                        />
-                      }
-                      placeholder="Account"
-                    />
-                  )}
-                </FormItem>
 
-                {this.state.modalTitle === '修改密码' ? (
-                  <div>
-                    <FormItem hasFeedback={true}>
-                      {getFieldDecorator('oldPassword', {
-                        rules: [
-                          {
-                            required: true,
-                            message: 'Please input your OldPassword!'
-                          }
-                        ]
-                      })(
-                        <Input
-                          prefix={
-                            <Icon
-                              type="lock"
-                              style={{ color: 'rgba(0,0,0,.25)' }}
-                            />
-                          }
-                          type="password"
-                          placeholder="OldPassword"
+                <Menu.Item key="message" className={style['menu-item']}>
+                  <Link to="/Message">
+                    <Icon type="mail" />
+                    留言
+                  </Link>
+                </Menu.Item>
+
+                <Menu.Item key="about" className={style['menu-item']}>
+                  <Link to="/About">
+                    <Icon type="star" />
+                    关于我
+                  </Link>
+                </Menu.Item>
+
+                <Menu.Item
+                  key="reg"
+                  className={[style['menu-item'], style['menu-user']]}
+                  onClick={this.loginOrRegOrForgot.bind(this, 'reg')}
+                >
+                  注册
+                </Menu.Item>
+                {this.state.userInfo ? (
+                  <Menu.Item
+                    key="user"
+                    className={[style['menu-item'], style['menu-user']]}
+                  >
+                    <Dropdown
+                      overlay={
+                        <Menu>
+                          <Menu.Item>
+                            <Icon type="user" />
+                            个人中心
+                          </Menu.Item>
+                          <Menu.Item onClick={this.signOut}>
+                            <Icon type="logout" />
+                            退出登录
+                          </Menu.Item>
+                        </Menu>
+                      }
+                    >
+                      <a className="ant-dropdown-link" href="#">
+                        <Avatar
+                          src={this.state.userInfo.headImg}
+                          style={{ marginRight: '5px' }}
                         />
-                      )}
-                    </FormItem>
-                    <FormItem hasFeedback={true}>
-                      {getFieldDecorator('newPassword', {
-                        rules: [
-                          {
-                            required: true,
-                            message: 'Please input your NewPassword!'
-                          }
-                        ]
-                      })(
-                        <Input
-                          prefix={
-                            <Icon
-                              type="lock"
-                              style={{ color: 'rgba(0,0,0,.25)' }}
-                            />
-                          }
-                          type="password"
-                          placeholder="NewPassword"
-                        />
-                      )}
-                    </FormItem>
-                  </div>
+                        {this.state.userInfo.userName}
+                      </a>
+                    </Dropdown>
+                  </Menu.Item>
                 ) : (
+                  <Menu.Item
+                    key="login"
+                    className={[style['menu-item'], style['menu-user']]}
+                    onClick={this.loginOrRegOrForgot.bind(this, 'login')}
+                  >
+                    <Icon type="login" />
+                    登录
+                  </Menu.Item>
+                )}
+              </Menu>
+            </Header>
+            <Content className={style.content}>
+              <Modal
+                visible={this.state.visible}
+                title={this.state.modalTitle}
+                onOk={this.handleSubmit}
+                onCancel={this.handleCancel}
+                footer={[
+                  <Button key="back" onClick={this.handleCancel}>
+                    返回
+                  </Button>,
+                  <Button
+                    key="submit"
+                    type="primary"
+                    loading={this.state.loading}
+                    onClick={this.handleSubmit}
+                  >
+                    确定
+                  </Button>
+                ]}
+              >
+                <Form onSubmit={this.handleSubmit} className="login-form">
                   <FormItem hasFeedback={true}>
-                    {getFieldDecorator('password', {
+                    {getFieldDecorator('account', {
                       rules: [
                         {
                           required: true,
-                          message: 'Please input your Password!'
+                          message: 'Please input your account!'
                         }
                       ]
                     })(
                       <Input
                         prefix={
                           <Icon
-                            type="lock"
+                            type="user"
                             style={{ color: 'rgba(0,0,0,.25)' }}
                           />
                         }
-                        type="password"
-                        placeholder="Password"
+                        placeholder="Account"
                       />
                     )}
                   </FormItem>
-                )}
-                {this.state.modalTitle === '登录' ? (
-                  <FormItem>
-                    <a
-                      className="login-form-modifyPassword"
-                      onClick={this.loginOrRegOrForgot.bind(
-                        this,
-                        'modifyPassword'
-                      )}
-                    >
-                      modify password
-                    </a>
-                    Or{' '}
-                    <a onClick={this.loginOrRegOrForgot.bind(this, 'reg')}>
-                      register now!
-                    </a>
-                  </FormItem>
-                ) : (
-                  ''
-                )}
-                {this.state.modalTitle === '注册' ? (
-                  <div>
+
+                  {this.state.modalTitle === '修改密码' ? (
+                    <div>
+                      <FormItem hasFeedback={true}>
+                        {getFieldDecorator('oldPassword', {
+                          rules: [
+                            {
+                              required: true,
+                              message: 'Please input your OldPassword!'
+                            }
+                          ]
+                        })(
+                          <Input
+                            prefix={
+                              <Icon
+                                type="lock"
+                                style={{ color: 'rgba(0,0,0,.25)' }}
+                              />
+                            }
+                            type="password"
+                            placeholder="OldPassword"
+                          />
+                        )}
+                      </FormItem>
+                      <FormItem hasFeedback={true}>
+                        {getFieldDecorator('newPassword', {
+                          rules: [
+                            {
+                              required: true,
+                              message: 'Please input your NewPassword!'
+                            }
+                          ]
+                        })(
+                          <Input
+                            prefix={
+                              <Icon
+                                type="lock"
+                                style={{ color: 'rgba(0,0,0,.25)' }}
+                              />
+                            }
+                            type="password"
+                            placeholder="NewPassword"
+                          />
+                        )}
+                      </FormItem>
+                    </div>
+                  ) : (
                     <FormItem hasFeedback={true}>
-                      {getFieldDecorator('userName', {
+                      {getFieldDecorator('password', {
                         rules: [
                           {
                             required: true,
-                            message: 'Please input your userName!'
+                            message: 'Please input your Password!'
                           }
                         ]
                       })(
                         <Input
                           prefix={
                             <Icon
-                              type="smile-o"
+                              type="lock"
                               style={{ color: 'rgba(0,0,0,.25)' }}
                             />
                           }
-                          placeholder="UserName"
+                          type="password"
+                          placeholder="Password"
                         />
                       )}
                     </FormItem>
-                    <FormItem hasFeedback={true}>
-                      {getFieldDecorator('remark', {
-                        rules: [
-                          {
-                            required: true,
-                            message: 'Please input your remark!'
-                          }
-                        ]
-                      })(
-                        <Input
-                          prefix={
-                            <Icon
-                              type="edit"
-                              style={{ color: 'rgba(0,0,0,.25)' }}
-                            />
-                          }
-                          placeholder="Remark"
-                        />
-                      )}
-                    </FormItem>
-                  </div>
-                ) : (
-                  ''
-                )}
-              </Form>
-            </Modal>
-            <Row gutter={48}>
-              <Col className="gutter-row" span={6}>
-                <Card
-                  className={style.card}
-                  cover={
-                    <img
-                      alt="example"
-                      src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-                    />
-                  }
-                >
-                  <Meta
-                    avatar={<Avatar src={this.state.myInfo.headImg} />}
-                    title={this.state.myInfo.userName}
-                    description={this.state.myInfo.remark}
-                  />
-                  <Divider dashed={true} />
-                  <Meta
-                    title="标签"
-                    description={this.state.tags.map((item, index) => (
-                      <Tag
-                        color={
-                          this.state.colors[Math.floor(Math.random() * 10 + 1)]
-                        }
-                        key={index}
+                  )}
+                  {this.state.modalTitle === '登录' ? (
+                    <FormItem>
+                      <a
+                        className="login-form-modifyPassword"
+                        onClick={this.loginOrRegOrForgot.bind(
+                          this,
+                          'modifyPassword'
+                        )}
                       >
-                        {item}
-                      </Tag>
-                    ))}
-                  />
-                </Card>
-                <Card className={style.card}>
-                  <Calendar
-                    fullscreen={false}
-                    onPanelChange={this.onPanelChange}
-                  />
-                </Card>
-              </Col>
-              <Col className="gutter-row" span={18}>
-                <BrowserRouter>{renderRoutes(routes)}</BrowserRouter>
-              </Col>
-            </Row>
-          </Content>
-          <Footer style={{ textAlign: 'center' }}>
-            Ant Design ©2018 Created by Ant UED
-          </Footer>
+                        modify password
+                      </a>
+                      Or{' '}
+                      <a onClick={this.loginOrRegOrForgot.bind(this, 'reg')}>
+                        register now!
+                      </a>
+                    </FormItem>
+                  ) : (
+                    ''
+                  )}
+                  {this.state.modalTitle === '注册' ? (
+                    <div>
+                      <FormItem hasFeedback={true}>
+                        {getFieldDecorator('userName', {
+                          rules: [
+                            {
+                              required: true,
+                              message: 'Please input your userName!'
+                            }
+                          ]
+                        })(
+                          <Input
+                            prefix={
+                              <Icon
+                                type="smile-o"
+                                style={{ color: 'rgba(0,0,0,.25)' }}
+                              />
+                            }
+                            placeholder="UserName"
+                          />
+                        )}
+                      </FormItem>
+                      <FormItem hasFeedback={true}>
+                        {getFieldDecorator('remark', {
+                          rules: [
+                            {
+                              required: true,
+                              message: 'Please input your remark!'
+                            }
+                          ]
+                        })(
+                          <Input
+                            prefix={
+                              <Icon
+                                type="edit"
+                                style={{ color: 'rgba(0,0,0,.25)' }}
+                              />
+                            }
+                            placeholder="Remark"
+                          />
+                        )}
+                      </FormItem>
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                </Form>
+              </Modal>
+              <Row gutter={48}>
+                <Col className="gutter-row" span={6}>
+                  <Card
+                    className={style.card}
+                    cover={
+                      <img
+                        alt="example"
+                        src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
+                      />
+                    }
+                  >
+                    <Meta
+                      avatar={<Avatar src={this.state.myInfo.headImg} />}
+                      title={this.state.myInfo.userName}
+                      description={this.state.myInfo.remark}
+                    />
+                    <Divider dashed={true} />
+                    <Meta
+                      title="标签"
+                      description={this.state.tags.map((item, index) => (
+                        <Tag
+                          color={
+                            this.state.colors[
+                              Math.floor(Math.random() * 10 + 1)
+                            ]
+                          }
+                          key={index}
+                        >
+                          {item}
+                        </Tag>
+                      ))}
+                    />
+                  </Card>
+                  <Card className={style.card}>
+                    <Calendar
+                      fullscreen={false}
+                      onPanelChange={this.onPanelChange}
+                    />
+                  </Card>
+                </Col>
+                <Col className="gutter-row" span={18}>
+                  {renderRoutes(routes)}
+                </Col>
+              </Row>
+            </Content>
+            <Footer style={{ textAlign: 'center' }}>
+              Ant Design ©2018 Created by Ant UED
+            </Footer>
+          </Layout>
         </Layout>
-      </Layout>
+      </BrowserRouter>
     )
   }
 }
