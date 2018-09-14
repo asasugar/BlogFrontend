@@ -2,16 +2,19 @@ import React from 'react'
 import { Tabs, List, Icon, Card, Button, message, Modal } from 'antd'
 import style from './Home.scss'
 import request from '@/utils/request'
-import { isPower } from '@/utils'
+import { isPower, formatDate } from '@/utils'
 import { getLocalStorage } from '@/utils/localStorage'
 const confirm = Modal.confirm
 const TabPane = Tabs.TabPane
 const { Meta } = Card
 class Home extends React.Component {
   state = {
+    isActive: false,
+    LinkIndex: null,
     articleList: [],
     projectList: []
   }
+
   _renderIconText({ type, text }) {
     return (
       <span>
@@ -20,6 +23,33 @@ class Home extends React.Component {
       </span>
     )
   }
+
+  likeOrComment = async (type, index) => {
+    console.log(type, index)
+
+    if (type === 'like-o') {
+      // 点赞
+      await this.setState({ isActive: !this.state.isActive })
+      let articleList = []
+      if (this.state.isActive) {
+        articleList = this.state.articleList.map((item, idx) => {
+          if (idx === index) {
+            item.likeNum += 1
+          }
+          return item
+        })
+      } else {
+        articleList = this.state.articleList.map((item, idx) => {
+          if (idx === index) {
+            item.likeNum -= 1
+          }
+          return item
+        })
+      }
+      this.setState({ articleList, LinkIndex: index })
+    }
+  }
+
   async componentWillMount() {
     this.getList()
     let projectList = []
@@ -107,20 +137,26 @@ class Home extends React.Component {
               pageSize: 5
             }}
             dataSource={this.state.articleList}
-            renderItem={item => (
+            renderItem={(item, index) => (
               <div className={style.item}>
                 {this._renderDeleteIcon(item.articleId)}
                 <List.Item
-                  onClick={() => this.goDetail(item)}
                   key={item.title}
                   actions={[
-                    this._renderIconText({ type: 'star-o', text: 156 }),
-                    this._renderIconText({ type: 'like-o', text: 152 }),
-                    this._renderIconText({ type: 'message', text: 2 })
+                    this._renderIconText({
+                      type: 'area-chart',
+                      text: item.readNum
+                    }),
+                    this._renderIconText({ type: 'message', text: 2 }),
+                    this._renderIconText({
+                      type: 'clock-circle',
+                      text: formatDate(item.createTime)
+                    })
                   ]}
                   // extra={<img width={272} alt="logo" src={item.coverImg} />}
                 >
                   <List.Item.Meta
+                    onClick={() => this.goDetail(item)}
                     title={<a href={item.href}>{item.title}</a>}
                   />
                   {/* {item.content} */}

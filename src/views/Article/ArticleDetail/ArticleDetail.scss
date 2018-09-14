@@ -1,4 +1,37 @@
 .article-detail {
   background-color: #fff;
   padding: 20px;
+  .detail {
+    min-height: 525px;
+  }
+  .comment {
+    color: #909090;
+    font-size: 16px;
+    text-align: center;
+    .title {
+      padding: 20px 0 10px 0;
+    }
+    .no-login {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #f8f9fa;
+      border: 1px solid #f1f1f1;
+      border-radius: 4px;
+      height: 90px;
+      .btn {
+        padding: 5px 14px;
+        font-size: 14px;
+        color: #007fff;
+        background-color: transparent;
+        border: 1px solid currentColor;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      span {
+        padding-left: 15px;
+        color: #4a4a4a;
+      }
+    }
+  }
 }

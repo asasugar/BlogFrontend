@@ -17,6 +17,9 @@
   }
   .item {
     position: relative;
+    .active {
+      color: blue;
+    }
     .delete {
       position: absolute;
       top: 30%;

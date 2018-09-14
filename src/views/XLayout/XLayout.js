@@ -1,6 +1,7 @@
 import React from 'react'
 import { renderRoutes } from 'react-router-config'
 import { BrowserRouter, Link } from 'react-router-dom'
+
 import routes from '@/routes/index'
 import style from './XLayout.scss'
 import {
@@ -191,7 +192,7 @@ class XLayout extends React.Component {
     const { getFieldDecorator } = this.props.form
     return (
       <BrowserRouter>
-        <Layout className={style.layout}>
+        <Layout className={style.layout} ref="layout">
           <Layout>
             <Header className={style.header}>
               <Menu
