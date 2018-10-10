@@ -11,6 +11,16 @@
     .title {
       padding: 20px 0 10px 0;
     }
+    .content {
+      text-align: right;
+      background-color: #fafbfc;
+      border-radius: 3px;
+      padding: 1rem 1.333rem;
+      .content1 {
+        display: flex;
+        align-items: center;
+      }
+    }
     .no-login {
       display: flex;
       justify-content: center;
@@ -19,6 +29,7 @@
       border: 1px solid #f1f1f1;
       border-radius: 4px;
       height: 90px;
+      width: 100%;
       .btn {
         padding: 5px 14px;
         font-size: 14px;
@@ -32,6 +43,13 @@
         padding-left: 15px;
         color: #4a4a4a;
       }
+    }
+  }
+  .comment-list {
+    margin: 0 1.666rem 0 4.85rem;
+    .item {
+      margin-bottom: 1.333rem;
+      display: flex;
     }
   }
 }

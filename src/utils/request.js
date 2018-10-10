@@ -1,8 +1,10 @@
 import axios from 'axios'
 import qs from 'qs'
+import ip from 'ip'
+console.log(ip.address())
 axios.defaults.withCredentials = true
 const request = ({ method = 'get', url, data = {} }, otherConfig = {}) => {
-  url = /http/.test(url) ? url : `http://192.168.7.77:7001/blog${url}`
+  url = /http/.test(url) ? url : `http://${ip.address()}:7001/blog${url}`
   let config = {
     method,
     url,

@@ -98,6 +98,7 @@
     "eslint-config-standard": "^11.0.0",
     "eslint-loader": "^2.1.0",
     "eslint-plugin-node": "^7.0.1",
+    "ip": "^1.1.5",
     "node-sass": "^4.9.3",
     "sass-loader": "^7.1.0",
     "webpack-merge": "^4.1.4"

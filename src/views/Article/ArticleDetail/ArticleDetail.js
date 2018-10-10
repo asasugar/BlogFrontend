@@ -2,10 +2,11 @@ import React from 'react'
 import request from '@/utils/request'
 import { setLocalStorage, getLocalStorage } from '@/utils/localStorage'
 
-import { Form, Input, Button, Modal, Icon, message } from 'antd'
+import { Form, Input, Button, Modal, Icon, message, Avatar } from 'antd'
 
 const FormItem = Form.Item
 const { TextArea } = Input
+import { formatDate } from '@/utils'
 
 import style from './ArticleDetail.scss'
 
@@ -14,17 +15,30 @@ class AddArticle extends React.Component {
     detailInfo: {},
     userInfo: {},
     visible: false,
+    isShowCommentBtn: false,
+    commentValue: '',
     getCommentList: []
   }
 
-  componentDidMount() {
-    this.setState({ detailInfo: this.props.location.state })
+  async componentDidMount() {
+    await this.setState({
+      detailInfo: this.props.location.state || getLocalStorage('articleInfo')
+    })
+    if (getLocalStorage('userInfo')) {
+      await this.setState({
+        userInfo: getLocalStorage('userInfo')
+      })
+    }
     this.getCommentList()
   }
   componentWillUnmount() {}
 
   getCommentList = async () => {
     const { data } = await request({
+      data: {
+        userId: this.state.userInfo.userId || '',
+        articleId: this.state.detailInfo.articleId
+      },
       url: '/getCommentList'
     })
     if (data.success) {
@@ -32,8 +46,9 @@ class AddArticle extends React.Component {
     }
   }
 
-  submitComment = async () => {}
-  save = async () => {}
+  changeComment = async e => {
+    this.setState({ commentValue: e.target.value })
+  }
 
   login = async values => {
     const { data } = await request({
@@ -44,17 +59,17 @@ class AddArticle extends React.Component {
 
     if (data.success) {
       // 将登录信息存储localStory
-      setLocalStorage('userInfo', JSON.stringify(data.data))
+      setLocalStorage('userInfo', data.data)
       this.setState({
         userInfo: data.data,
         visible: false
       })
       this.props.form.resetFields()
       let t = setTimeout(() => {
+        this.getCommentList()
         message.success('登录成功')
       }, 1000)
       clearTimeout(t)
-      window.location.reload()
     } else message.error(data.msg)
   }
 
@@ -70,6 +85,24 @@ class AddArticle extends React.Component {
 
   handleCancel = () => {
     this.setState({ visible: false })
+  }
+
+  handleSubmitComment = async e => {
+    e.preventDefault()
+    console.log(this.state.userInfo)
+    const { data } = await request({
+      data: {
+        content: this.state.commentValue,
+        articleId: this.state.detailInfo.articleId,
+        userId: this.state.userInfo.userId
+      },
+      url: '/addComment',
+      method: 'post'
+    })
+    if (data.success) {
+      message.success(data.msg)
+      this.getCommentList()
+    }
   }
 
   render() {
@@ -136,24 +169,74 @@ class AddArticle extends React.Component {
         />
         <div className={style.comment}>
           <p className={style.title}>评论</p>
-          <div />
-          {JSON.parse(getLocalStorage('userInfo')) ? (
-            <TextArea
-              id="comment"
-              autosize={{ minRows: 2, maxRows: 6 }}
-              onPressEnter={this.submitComment}
-            />
-          ) : (
-            <div className={style['no-login']}>
-              <div
-                className={style.btn}
-                onClick={() => this.setState({ visible: true })}
-              >
-                登录
-              </div>
-              <span>说说你的看法</span>
+          <div className={style.content}>
+            <div className={style.content1}>
+              {/* <Avatar
+                src={this.state.userInfo.headImg}
+                style={{ marginRight: '5px' }}
+              /> */}
+              {getLocalStorage('userInfo') ? (
+                <TextArea
+                  id="comment"
+                  autosize={{ minRows: 2, maxRows: 6 }}
+                  onChange={this.changeComment}
+                  placeholder="输入评论..."
+                  onClick={() => this.setState({ isShowCommentBtn: true })}
+                />
+              ) : (
+                <div className={style['no-login']}>
+                  <div
+                    className={style.btn}
+                    onClick={() => this.setState({ visible: true })}
+                  >
+                    登录
+                  </div>
+                  <span>说说你的看法</span>
+                </div>
+              )}
             </div>
-          )}
+            {this.state.isShowCommentBtn ? (
+              <Button
+                style={{ marginTop: '10px' }}
+                key="submit"
+                type="primary"
+                disabled={this.state.commentValue ? false : true}
+                onClick={this.handleSubmitComment}
+              >
+                评论
+              </Button>
+            ) : (
+              ''
+            )}
+          </div>
+        </div>
+        <div className={style['comment-list']}>
+          {this.state.getCommentList.map((item, index) => {
+            return (
+              <div className={style.item} key={index}>
+                <div>
+                  <Avatar src={item.headImg} style={{ marginRight: '5px' }} />
+                </div>
+                <div
+                  style={{
+                    borderBottom: '1px solid #f1f1f1',
+                    color: '#505050'
+                  }}
+                >
+                  <p style={{ color: '#333' }}>{item.userName}</p>
+                  {item.content}
+                  <p style={{ color: '#8a9aa9', marginTop: '5px' }}>
+                    <Icon
+                      type="clock-circle"
+                      theme="outlined"
+                      style={{ marginRight: '5px' }}
+                    />
+                    {formatDate(item.createTime)}
+                  </p>
+                </div>
+              </div>
+            )
+          })}
         </div>
       </div>
     )

@@ -3,7 +3,7 @@ import { Tabs, List, Icon, Card, Button, message, Modal } from 'antd'
 import style from './Home.scss'
 import request from '@/utils/request'
 import { isPower, formatDate } from '@/utils'
-import { getLocalStorage } from '@/utils/localStorage'
+import { setLocalStorage, getLocalStorage } from '@/utils/localStorage'
 const confirm = Modal.confirm
 const TabPane = Tabs.TabPane
 const { Meta } = Card
@@ -22,32 +22,6 @@ class Home extends React.Component {
         {text}
       </span>
     )
-  }
-
-  likeOrComment = async (type, index) => {
-    console.log(type, index)
-
-    if (type === 'like-o') {
-      // 点赞
-      await this.setState({ isActive: !this.state.isActive })
-      let articleList = []
-      if (this.state.isActive) {
-        articleList = this.state.articleList.map((item, idx) => {
-          if (idx === index) {
-            item.likeNum += 1
-          }
-          return item
-        })
-      } else {
-        articleList = this.state.articleList.map((item, idx) => {
-          if (idx === index) {
-            item.likeNum -= 1
-          }
-          return item
-        })
-      }
-      this.setState({ articleList, LinkIndex: index })
-    }
   }
 
   async componentWillMount() {
@@ -85,6 +59,7 @@ class Home extends React.Component {
   }
   // 到详情
   goDetail = info => {
+    setLocalStorage('articleInfo', info)
     this.props.history.push('/ArticleDetail', info)
   }
   // 删除
@@ -110,7 +85,7 @@ class Home extends React.Component {
   // 是否显示删除按钮
   _renderDeleteIcon = articleId => {
     if (getLocalStorage('userInfo')) {
-      let r = isPower(JSON.parse(getLocalStorage('userInfo')))
+      let r = isPower(getLocalStorage('userInfo'))
       if (r) {
         return (
           <Icon
@@ -144,7 +119,7 @@ class Home extends React.Component {
                   key={item.title}
                   actions={[
                     this._renderIconText({
-                      type: 'area-chart',
+                      type: 'like',
                       text: item.readNum
                     }),
                     this._renderIconText({ type: 'message', text: 2 }),

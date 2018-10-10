@@ -65,7 +65,7 @@ class XLayout extends React.Component {
       this.setState({ myInfo: data.data })
     }
     if (getLocalStorage('userInfo')) {
-      this.setState({ userInfo: JSON.parse(getLocalStorage('userInfo')) })
+      this.setState({ userInfo: getLocalStorage('userInfo') })
     }
   }
   async componentDidMount() {
@@ -124,7 +124,7 @@ class XLayout extends React.Component {
     }, 1500)
     if (data.success) {
       // 将登录信息存储localStory
-      setLocalStorage('userInfo', JSON.stringify(data.data))
+      setLocalStorage('userInfo', data.data)
       this.setState({
         userInfo: data.data,
         visible: false
