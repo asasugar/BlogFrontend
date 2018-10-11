@@ -297,6 +297,7 @@ class XLayout extends React.Component {
                   </Menu.Item>
                 ) : (
                   <Menu.Item
+                    ref="login"
                     key="login"
                     className={[style['menu-item'], style['menu-user']]}
                     onClick={this.loginOrRegOrForgot.bind(this, 'login')}

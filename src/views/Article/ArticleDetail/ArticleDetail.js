@@ -30,6 +30,7 @@ class AddArticle extends React.Component {
       })
     }
     this.getCommentList()
+    console.log(this.refs)
   }
   componentWillUnmount() {}
 
