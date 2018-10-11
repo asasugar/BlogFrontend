@@ -20,7 +20,8 @@ import {
   Modal,
   Button,
   Form,
-  Input
+  Input,
+  Upload
 } from 'antd'
 import request from '@/utils/request'
 import {
@@ -136,7 +137,8 @@ class XLayout extends React.Component {
 
   reg = async values => {
     this.setState({ loading: true })
-
+    console.log(values)
+    values.headImg = values.headImg.file.response.data
     const { data } = await request({
       data: values,
       url: '/reg',
@@ -188,8 +190,43 @@ class XLayout extends React.Component {
     })
   }
 
+  normFile = e => {
+    console.log('Upload event:', e)
+    if (Array.isArray(e)) {
+      return e
+    }
+    return e && e.fileList
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form
+    const formItemLayout = {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 5 }
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 12 }
+      }
+    }
+    const props = {
+      name: 'file',
+      action: 'http://192.168.7.165:7001/blog/upload',
+      headers: {
+        authorization: 'authorization-text'
+      },
+      onChange(info) {
+        if (info.file.status !== 'uploading') {
+          console.log(info.file, info.fileList)
+        }
+        if (info.file.status === 'done') {
+          message.success(`${info.file.name} file uploaded successfully`)
+        } else if (info.file.status === 'error') {
+          message.error(`${info.file.name} file upload failed.`)
+        }
+      }
+    }
     return (
       <BrowserRouter>
         <Layout className={style.layout} ref="layout">
@@ -291,7 +328,7 @@ class XLayout extends React.Component {
                 ]}
               >
                 <Form onSubmit={this.handleSubmit} className="login-form">
-                  <FormItem hasFeedback={true}>
+                  <FormItem hasFeedback={true} label="账号" {...formItemLayout}>
                     {getFieldDecorator('account', {
                       rules: [
                         {
@@ -314,7 +351,11 @@ class XLayout extends React.Component {
 
                   {this.state.modalTitle === '修改密码' ? (
                     <div>
-                      <FormItem hasFeedback={true}>
+                      <FormItem
+                        hasFeedback={true}
+                        label="旧密码"
+                        {...formItemLayout}
+                      >
                         {getFieldDecorator('oldPassword', {
                           rules: [
                             {
@@ -335,7 +376,11 @@ class XLayout extends React.Component {
                           />
                         )}
                       </FormItem>
-                      <FormItem hasFeedback={true}>
+                      <FormItem
+                        hasFeedback={true}
+                        label="新密码"
+                        {...formItemLayout}
+                      >
                         {getFieldDecorator('newPassword', {
                           rules: [
                             {
@@ -358,7 +403,11 @@ class XLayout extends React.Component {
                       </FormItem>
                     </div>
                   ) : (
-                    <FormItem hasFeedback={true}>
+                    <FormItem
+                      hasFeedback={true}
+                      label="密码"
+                      {...formItemLayout}
+                    >
                       {getFieldDecorator('password', {
                         rules: [
                           {
@@ -401,7 +450,11 @@ class XLayout extends React.Component {
                   )}
                   {this.state.modalTitle === '注册' ? (
                     <div>
-                      <FormItem hasFeedback={true}>
+                      <FormItem
+                        hasFeedback={true}
+                        label="昵称"
+                        {...formItemLayout}
+                      >
                         {getFieldDecorator('userName', {
                           rules: [
                             {
@@ -421,7 +474,11 @@ class XLayout extends React.Component {
                           />
                         )}
                       </FormItem>
-                      <FormItem hasFeedback={true}>
+                      <FormItem
+                        hasFeedback={true}
+                        label="个性签名"
+                        {...formItemLayout}
+                      >
                         {getFieldDecorator('remark', {
                           rules: [
                             {
@@ -439,6 +496,19 @@ class XLayout extends React.Component {
                             }
                             placeholder="Remark"
                           />
+                        )}
+                      </FormItem>
+                      <FormItem
+                        hasFeedback={true}
+                        label="头像"
+                        {...formItemLayout}
+                      >
+                        {getFieldDecorator('headImg')(
+                          <Upload {...props}>
+                            <Button>
+                              <Icon type="upload" /> Upload
+                            </Button>
+                          </Upload>
                         )}
                       </FormItem>
                     </div>

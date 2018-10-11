@@ -12,7 +12,9 @@ class Home extends React.Component {
     isActive: false,
     LinkIndex: null,
     articleList: [],
-    projectList: []
+    projectList: [],
+    pageNo: 1,
+    pageSize: 5
   }
 
   _renderIconText({ type, text }) {
@@ -42,18 +44,14 @@ class Home extends React.Component {
   }
   getList = async () => {
     const { data } = await request({
+      data: {
+        pageNo: this.state.pageNo,
+        pageSize: this.state.pageSize
+      },
       url: '/getArticleList'
     })
 
     if (data.success) {
-      // let articleList = data.data.map(item => {
-      //   if (!item.coverImg) {
-      //     // 默认图片
-      //     item.coverImg =
-      //       'https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png'
-      //   }
-      //   return item
-      // })
       this.setState({ articleList: data.data })
     }
   }
@@ -83,7 +81,7 @@ class Home extends React.Component {
     })
   }
   // 是否显示删除按钮
-  _renderDeleteIcon = articleId => {
+  _renderDeleteBtn = articleId => {
     if (getLocalStorage('userInfo')) {
       let r = isPower(getLocalStorage('userInfo'))
       if (r) {
@@ -98,6 +96,25 @@ class Home extends React.Component {
     }
   }
 
+  // 是否显示写文章按钮
+  _renderAddBtn = () => {
+    if (getLocalStorage('userInfo')) {
+      let r = isPower(getLocalStorage('userInfo'))
+      if (r) {
+        return (
+          <Button
+            type="primary"
+            className={style.write}
+            onClick={() => {
+              this.props.history.push('/AddArticle')
+            }}
+          >
+            写文章
+          </Button>
+        )
+      }
+    }
+  }
   _renderList = () => {
     return (
       <Tabs onChange={this.changeTab} type="line">
@@ -114,15 +131,14 @@ class Home extends React.Component {
             dataSource={this.state.articleList}
             renderItem={(item, index) => (
               <div className={style.item}>
-                {this._renderDeleteIcon(item.articleId)}
+                {this._renderDeleteBtn(item.articleId)}
                 <List.Item
                   key={item.title}
                   actions={[
                     this._renderIconText({
-                      type: 'like',
-                      text: item.readNum
+                      type: 'message',
+                      text: item.commentNum
                     }),
-                    this._renderIconText({ type: 'message', text: 2 }),
                     this._renderIconText({
                       type: 'clock-circle',
                       text: formatDate(item.createTime)
@@ -183,16 +199,7 @@ class Home extends React.Component {
     return (
       <div className={style.home}>
         {this._renderList()}
-        <Button
-          type="primary"
-          className={style.write}
-          onClick={() => {
-            console.log(this)
-            this.props.history.push('/AddArticle')
-          }}
-        >
-          写文章
-        </Button>
+        {this._renderAddBtn()}
       </div>
     )
   }

@@ -2,7 +2,7 @@ import React from 'react'
 import MarkDown from '@/components/MarkDown'
 import request from '@/utils/request'
 
-import { Button, message, Upload, Icon, Modal } from 'antd'
+import { Button, message } from 'antd'
 import style from './AddArticle.scss'
 
 class AddArticle extends React.Component {
@@ -30,33 +30,10 @@ class AddArticle extends React.Component {
     }
   }
   render() {
-    const props = {
-      name: 'file',
-      action: '//jsonplaceholder.typicode.com/posts/',
-      headers: {
-        authorization: 'authorization-text'
-      },
-      onChange(info) {
-        if (info.file.status !== 'uploading') {
-          console.log(info)
-        }
-        if (info.file.status === 'done') {
-          message.success(`${info.file.name} file uploaded successfully`)
-        } else if (info.file.status === 'error') {
-          message.error(`${info.file.name} file upload failed.`)
-        }
-      }
-    }
-
     return (
       <div className={style['add-article']}>
         <MarkDown ref="markDown" />
         <div className={style.btn}>
-          <Upload {...props}>
-            <Button className={style.upload}>
-              <Icon type="upload" /> Click to Upload
-            </Button>
-          </Upload>
           <Button type="primary" onClick={this.save} className={style.save}>
             保存
           </Button>
