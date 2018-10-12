@@ -5,7 +5,7 @@ console.log(ip.address())
 axios.defaults.withCredentials = true
 const request = ({ method = 'get', url, data = {} }, otherConfig = {}) => {
   // url = /http/.test(url) ? url : `http://${ip.address()}:7001/blog${url}`
-  url = /http/.test(url) ? url : `http://192.168.7.165:7001/blog${url}`
+  url = /http/.test(url) ? url : `http://192.168.7.146:7001/blog${url}`
 
   let config = {
     method,

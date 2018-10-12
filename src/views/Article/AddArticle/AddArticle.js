@@ -2,14 +2,20 @@ import React from 'react'
 import MarkDown from '@/components/MarkDown'
 import request from '@/utils/request'
 
-import { Button, message } from 'antd'
+import { Button, message, Input } from 'antd'
 import style from './AddArticle.scss'
 
 class AddArticle extends React.Component {
-  state = {}
+  state = {
+    tagName: ''
+  }
 
   componentDidMount() {}
   componentWillUnmount() {}
+
+  tagNameChange = e => {
+    this.setState({ tagName: e.target.value })
+  }
 
   save = async () => {
     if (
@@ -17,7 +23,9 @@ class AddArticle extends React.Component {
       this.refs.markDown.state.form.content
     ) {
       const { data } = await request({
-        data: this.refs.markDown.state.form,
+        data: Object.assign(this.refs.markDown.state.form, {
+          tagName: this.state.tagName
+        }),
         url: '/addArticle',
         method: 'post'
       })
@@ -33,7 +41,13 @@ class AddArticle extends React.Component {
     return (
       <div className={style['add-article']}>
         <MarkDown ref="markDown" />
+
         <div className={style.btn}>
+          <Input
+            placeholder="请输入标签"
+            value={this.state.tagName}
+            onChange={this.tagNameChange}
+          />
           <Button type="primary" onClick={this.save} className={style.save}>
             保存
           </Button>

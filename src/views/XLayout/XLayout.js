@@ -37,7 +37,7 @@ const FormItem = Form.Item
 class XLayout extends React.Component {
   state = {
     current: 'home',
-    tags: ['很有想法的', '专注前端'],
+    tags: [],
     colors: [
       'magenta',
       'red',
@@ -68,6 +68,7 @@ class XLayout extends React.Component {
     if (getLocalStorage('userInfo')) {
       this.setState({ userInfo: getLocalStorage('userInfo') })
     }
+    this.getTagList()
   }
   async componentDidMount() {
     // 相当于vue的mouted
@@ -81,6 +82,13 @@ class XLayout extends React.Component {
 
   handleCancel = () => {
     this.setState({ visible: false })
+  }
+
+  getTagList = async () => {
+    const { data } = await request({
+      url: '/getTagList'
+    })
+    if (data.success) this.setState({ tags: data.data })
   }
 
   signOut = () => {
@@ -546,7 +554,7 @@ class XLayout extends React.Component {
                           }
                           key={index}
                         >
-                          {item}
+                          {item.tagName}
                         </Tag>
                       ))}
                     />

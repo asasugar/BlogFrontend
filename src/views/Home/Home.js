@@ -1,11 +1,24 @@
 import React from 'react'
-import { Tabs, List, Icon, Card, Button, message, Modal } from 'antd'
+import {
+  Tabs,
+  List,
+  Icon,
+  Card,
+  Button,
+  message,
+  Modal,
+  Tag,
+  Form,
+  Select
+} from 'antd'
 import style from './Home.scss'
 import request from '@/utils/request'
 import { isPower, formatDate } from '@/utils'
 import { setLocalStorage, getLocalStorage } from '@/utils/localStorage'
 const confirm = Modal.confirm
 const TabPane = Tabs.TabPane
+const FormItem = Form.Item
+const Option = Select.Option
 const { Meta } = Card
 class Home extends React.Component {
   state = {
@@ -13,16 +26,37 @@ class Home extends React.Component {
     LinkIndex: null,
     articleList: [],
     projectList: [],
+    tags: [],
     pageNo: 1,
-    pageSize: 5
+    pageSize: 5,
+    tagName: '',
+    colors: [
+      'magenta',
+      'red',
+      'volcano',
+      'orange',
+      'gold',
+      'green',
+      'cyan',
+      'blue',
+      'geekblue',
+      'purple'
+    ]
   }
 
-  _renderIconText({ type, text }) {
+  _renderIconText({ type, text, info }) {
     return (
-      <span>
+      <span onClick={() => this.goDetail(info)}>
         <Icon type={type} style={{ marginRight: 8 }} />
         {text}
       </span>
+    )
+  }
+  _renderTag(text) {
+    return (
+      <Tag color={this.state.colors[Math.floor(Math.random() * 10 + 1)]}>
+        {text ? text : '未分类'}
+      </Tag>
     )
   }
 
@@ -38,6 +72,7 @@ class Home extends React.Component {
       })
     }
     this.setState({ projectList })
+    this.getTagList()
   }
   changeTab(key) {
     console.log(key)
@@ -46,7 +81,8 @@ class Home extends React.Component {
     const { data } = await request({
       data: {
         pageNo: this.state.pageNo,
-        pageSize: this.state.pageSize
+        pageSize: this.state.pageSize,
+        tagName: this.state.tagName
       },
       url: '/getArticleList'
     })
@@ -96,6 +132,18 @@ class Home extends React.Component {
     }
   }
 
+  getTagList = async () => {
+    const { data } = await request({
+      url: '/getTagList'
+    })
+    if (data.success) this.setState({ tags: data.data })
+  }
+
+  onSelect = (key, e) => {
+    this.setState({ tagName: e.props.children })
+    // this.getList()
+  }
+
   // 是否显示写文章按钮
   _renderAddBtn = () => {
     if (getLocalStorage('userInfo')) {
@@ -116,9 +164,28 @@ class Home extends React.Component {
     }
   }
   _renderList = () => {
+    const formItemLayout = {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 5 }
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 12 }
+      }
+    }
     return (
       <Tabs onChange={this.changeTab} type="line">
         <TabPane tab="文章" key="1">
+          <Form>
+            <FormItem {...formItemLayout} label="分类" hasFeedback>
+              <Select placeholder="请选择分类" onSelect={this.onSelect}>
+                {this.state.tags.map((item, index) => (
+                  <Option key={index}>{item.tagName}</Option>
+                ))}
+              </Select>
+            </FormItem>
+          </Form>
           <List
             itemLayout="vertical"
             size="large"
@@ -135,13 +202,16 @@ class Home extends React.Component {
                 <List.Item
                   key={item.title}
                   actions={[
+                    this._renderTag(item.tagName),
                     this._renderIconText({
                       type: 'message',
-                      text: item.commentNum
+                      text: item.commentNum,
+                      info: item
                     }),
                     this._renderIconText({
                       type: 'clock-circle',
-                      text: formatDate(item.createTime)
+                      text: formatDate(item.createTime),
+                      info: item
                     })
                   ]}
                   // extra={<img width={272} alt="logo" src={item.coverImg} />}
@@ -150,7 +220,6 @@ class Home extends React.Component {
                     onClick={() => this.goDetail(item)}
                     title={<a href={item.href}>{item.title}</a>}
                   />
-                  {/* {item.content} */}
                 </List.Item>
               </div>
             )}
