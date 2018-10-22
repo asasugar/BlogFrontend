@@ -77,12 +77,13 @@ class Home extends React.Component {
   changeTab(key) {
     console.log(key)
   }
-  getList = async () => {
+  getList = async tagName => {
+    console.log(tagName)
     const { data } = await request({
       data: {
         pageNo: this.state.pageNo,
         pageSize: this.state.pageSize,
-        tagName: this.state.tagName
+        tagName
       },
       url: '/getArticleList'
     })
@@ -141,7 +142,7 @@ class Home extends React.Component {
 
   onSelect = (key, e) => {
     this.setState({ tagName: e.props.children })
-    // this.getList()
+    this.getList(e.props.children)
   }
 
   // 是否显示写文章按钮
