@@ -1,7 +1,9 @@
 import React from 'react'
 import { renderRoutes } from 'react-router-config'
 import { BrowserRouter, Link } from 'react-router-dom'
+import { inject, observer } from 'mobx-react'
 import style from './XLayout.scss'
+
 import {
   Layout,
   Menu,
@@ -32,6 +34,9 @@ const { Meta } = Card
 const { Header, Content, Footer } = Layout
 const confirm = Modal.confirm
 const FormItem = Form.Item
+
+@inject('store')
+@observer
 class XLayout extends React.Component {
   state = {
     current: 'home',
@@ -64,13 +69,12 @@ class XLayout extends React.Component {
       this.setState({ myInfo: data.data })
     }
     if (getLocalStorage('userInfo')) {
-      this.setState({ userInfo: getLocalStorage('userInfo') })
+      this.props.store.user.saveUserInfo(getLocalStorage('userInfo'))
     }
     this.getTagList()
   }
   async componentDidMount() {
     // 相当于vue的mouted
-    console.log(this.props.route)
   }
 
   handleClick = e => {
@@ -94,12 +98,13 @@ class XLayout extends React.Component {
     const _this = this
     confirm({
       title: 'Do you want to signOut?',
-      onOk() {
+      onOk: () => {
         _this.setState({
           userInfo: null
         })
         message.success('Success')
         clearStorage()
+        this.props.store.user.saveUserInfo({})
       },
       onCancel() {
         message.warning('Cancel')
@@ -133,6 +138,7 @@ class XLayout extends React.Component {
     if (data.success) {
       // 将登录信息存储localStory
       setLocalStorage('userInfo', data.data)
+      this.props.store.user.saveUserInfo(data.data)
       this.setState({
         userInfo: data.data,
         visible: false
@@ -274,7 +280,7 @@ class XLayout extends React.Component {
                 >
                   注册
                 </Menu.Item>
-                {getLocalStorage('userInfo') ? (
+                {Object.keys(this.props.store.user.userInfo).length !== 0 ? (
                   <Menu.Item
                     key="user"
                     className={[style['menu-item'], style['menu-user']]}
@@ -295,10 +301,10 @@ class XLayout extends React.Component {
                     >
                       <a className="ant-dropdown-link" href="#">
                         <Avatar
-                          src={getLocalStorage('userInfo').headImg}
+                          src={this.props.store.user.userInfo.headImg}
                           style={{ marginRight: '5px' }}
                         />
-                        {getLocalStorage('userInfo').userName}
+                        {this.props.store.user.userInfo.userName}
                       </a>
                     </Dropdown>
                   </Menu.Item>

@@ -1,6 +1,7 @@
 import React from 'react'
 import request from '@/utils/request'
 import { setLocalStorage, getLocalStorage } from '@/utils/localStorage'
+import { inject, observer } from 'mobx-react'
 
 import { Form, Input, Button, Modal, Icon, message, Avatar } from 'antd'
 
@@ -9,7 +10,10 @@ const { TextArea } = Input
 import { formatDate } from '@/utils'
 
 import style from './ArticleDetail.scss'
+import { Object } from 'core-js'
 
+@inject('store')
+@observer
 class AddArticle extends React.Component {
   state = {
     detailInfo: {},
@@ -25,9 +29,10 @@ class AddArticle extends React.Component {
       detailInfo: this.props.location.state || getLocalStorage('articleInfo')
     })
     if (getLocalStorage('userInfo')) {
-      await this.setState({
-        userInfo: getLocalStorage('userInfo')
-      })
+      // await this.setState({
+      //   userInfo: getLocalStorage('userInfo')
+      // })
+      this.props.store.user.saveUserInfo(getLocalStorage('userInfo'))
     }
     this.getCommentList()
     console.log(this.refs)
@@ -37,7 +42,7 @@ class AddArticle extends React.Component {
   getCommentList = async () => {
     const { data } = await request({
       data: {
-        userId: this.state.userInfo.userId || '',
+        userId: this.props.store.user.userInfo.userId || '',
         articleId: this.state.detailInfo.articleId
       },
       url: '/getCommentList'
@@ -61,6 +66,7 @@ class AddArticle extends React.Component {
     if (data.success) {
       // 将登录信息存储localStory
       setLocalStorage('userInfo', data.data)
+      this.props.store.user.saveUserInfo(data.data)
       this.setState({
         userInfo: data.data,
         visible: false
@@ -90,12 +96,11 @@ class AddArticle extends React.Component {
 
   handleSubmitComment = async e => {
     e.preventDefault()
-    console.log(this.state.userInfo)
     const { data } = await request({
       data: {
         content: this.state.commentValue,
         articleId: this.state.detailInfo.articleId,
-        userId: this.state.userInfo.userId
+        userId: this.props.store.user.userInfo.userId
       },
       url: '/addComment',
       method: 'post'
@@ -172,11 +177,7 @@ class AddArticle extends React.Component {
           <p className={style.title}>评论</p>
           <div className={style.content}>
             <div className={style.content1}>
-              {/* <Avatar
-                src={this.state.userInfo.headImg}
-                style={{ marginRight: '5px' }}
-              /> */}
-              {getLocalStorage('userInfo') ? (
+              {Object.keys(this.props.store.user.userInfo).length !== 0 ? (
                 <TextArea
                   id="comment"
                   autosize={{ minRows: 2, maxRows: 6 }}
