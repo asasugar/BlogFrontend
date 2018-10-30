@@ -1,8 +1,6 @@
 import React from 'react'
 import { renderRoutes } from 'react-router-config'
 import { BrowserRouter, Link } from 'react-router-dom'
-
-import routes from '@/routes/index'
 import style from './XLayout.scss'
 import {
   Layout,
@@ -72,6 +70,7 @@ class XLayout extends React.Component {
   }
   async componentDidMount() {
     // 相当于vue的mouted
+    console.log(this.props.route)
   }
 
   handleClick = e => {
@@ -220,7 +219,7 @@ class XLayout extends React.Component {
     }
     const props = {
       name: 'file',
-      action: 'http://192.168.7.165:7001/blog/upload',
+      action: 'http://192.168.7.146:7001/blog/upload',
       headers: {
         authorization: 'authorization-text'
       },
@@ -275,7 +274,7 @@ class XLayout extends React.Component {
                 >
                   注册
                 </Menu.Item>
-                {this.state.userInfo ? (
+                {getLocalStorage('userInfo') ? (
                   <Menu.Item
                     key="user"
                     className={[style['menu-item'], style['menu-user']]}
@@ -296,10 +295,10 @@ class XLayout extends React.Component {
                     >
                       <a className="ant-dropdown-link" href="#">
                         <Avatar
-                          src={this.state.userInfo.headImg}
+                          src={getLocalStorage('userInfo').headImg}
                           style={{ marginRight: '5px' }}
                         />
-                        {this.state.userInfo.userName}
+                        {getLocalStorage('userInfo').userName}
                       </a>
                     </Dropdown>
                   </Menu.Item>
@@ -567,7 +566,7 @@ class XLayout extends React.Component {
                   </Card>
                 </Col>
                 <Col className="gutter-row" span={18}>
-                  {renderRoutes(routes)}
+                  {renderRoutes(this.props.route.children)}
                 </Col>
               </Row>
             </Content>

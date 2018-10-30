@@ -78,12 +78,11 @@ class Home extends React.Component {
     console.log(key)
   }
   getList = async tagName => {
-    console.log(tagName)
     const { data } = await request({
       data: {
         pageNo: this.state.pageNo,
         pageSize: this.state.pageSize,
-        tagName
+        tagName: ''
       },
       url: '/getArticleList'
     })
