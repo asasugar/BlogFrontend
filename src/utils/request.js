@@ -3,15 +3,18 @@ import qs from 'qs'
 import ip from 'ip'
 console.log(ip.address())
 axios.defaults.withCredentials = true
-const request = ({ method = 'get', url, data = {} }, otherConfig = {}) => {
-  // url = /http/.test(url) ? url : `http://${ip.address()}:7001/blog${url}`
-  url = /http/.test(url) ? url : `http://192.168.7.146:7001/blog${url}`
+const request = ({
+  method = 'get',
+  url,
+  data = {}
+}, otherConfig = {}) => {
+  url = /http/.test(url) ? url : `http://${ip.address()}:7001/blog${url}`
+  // url = /http/.test(url) ? url : `http://192.168.7.146:7001/blog${url}`
 
   let config = {
     method,
     url,
-    [method === 'get' ? 'params' : 'data']:
-      method === 'get' ? data : qs.stringify(data),
+    [method === 'get' ? 'params' : 'data']: method === 'get' ? data : qs.stringify(data),
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
     },

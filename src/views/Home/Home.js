@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import {
   Tabs,
   List,
@@ -10,16 +10,16 @@ import {
   Tag,
   Form,
   Select
-} from 'antd'
-import style from './Home.scss'
-import request from '@/utils/request'
-import { isPower, formatDate } from '@/utils'
-import { setLocalStorage, getLocalStorage } from '@/utils/localStorage'
-const confirm = Modal.confirm
-const TabPane = Tabs.TabPane
-const FormItem = Form.Item
-const Option = Select.Option
-const { Meta } = Card
+} from "antd";
+import style from "./Home.scss";
+import request from "@/utils/request";
+import { isPower, formatDate } from "@/utils";
+import { setLocalStorage, getLocalStorage } from "@/utils/localStorage";
+const confirm = Modal.confirm;
+const TabPane = Tabs.TabPane;
+const FormItem = Form.Item;
+const Option = Select.Option;
+const { Meta } = Card;
 class Home extends React.Component {
   state = {
     isActive: false,
@@ -29,20 +29,20 @@ class Home extends React.Component {
     tags: [],
     pageNo: 1,
     pageSize: 5,
-    tagName: '',
+    tagName: "",
     colors: [
-      'magenta',
-      'red',
-      'volcano',
-      'orange',
-      'gold',
-      'green',
-      'cyan',
-      'blue',
-      'geekblue',
-      'purple'
+      "magenta",
+      "red",
+      "volcano",
+      "orange",
+      "gold",
+      "green",
+      "cyan",
+      "blue",
+      "geekblue",
+      "purple"
     ]
-  }
+  };
 
   _renderIconText({ type, text, info }) {
     return (
@@ -50,76 +50,76 @@ class Home extends React.Component {
         <Icon type={type} style={{ marginRight: 8 }} />
         {text}
       </span>
-    )
+    );
   }
   _renderTag(text) {
     return (
       <Tag color={this.state.colors[Math.floor(Math.random() * 10 + 1)]}>
-        {text ? text : '未分类'}
+        {text ? text : "未分类"}
       </Tag>
-    )
+    );
   }
 
   async componentWillMount() {
-    this.getList()
-    let projectList = []
+    this.getList();
+    let projectList = [];
     for (let i = 0; i < 23; i++) {
       projectList.push({
-        alt: 'example',
-        avatar: 'https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png',
+        alt: "example",
+        avatar: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
         title: `Europe Street beat ${i}`,
-        description: 'www.instagram.com'
-      })
+        description: "www.instagram.com"
+      });
     }
-    this.setState({ projectList })
-    this.getTagList()
+    this.setState({ projectList });
+    this.getTagList();
   }
   changeTab(key) {
-    console.log(key)
+    console.log(key);
   }
   getList = async tagName => {
     const { data } = await request({
+      url: "/getArticleList",
       data: {
         pageNo: this.state.pageNo,
         pageSize: this.state.pageSize,
-        tagName: ''
-      },
-      url: '/getArticleList'
-    })
+        tagName
+      }
+    });
 
     if (data.success) {
-      this.setState({ articleList: data.data })
+      this.setState({ articleList: data.data });
     }
-  }
+  };
   // 到详情
   goDetail = info => {
-    setLocalStorage('articleInfo', info)
-    this.props.history.push('/ArticleDetail', info)
-  }
+    setLocalStorage("articleInfo", info);
+    this.props.history.push("/ArticleDetail", info);
+  };
   // 删除
   deleteArticle = id => {
     confirm({
-      title: 'Do you want to delete?',
+      title: "Do you want to delete?",
       onOk: async () => {
         const { data } = await request({
-          url: '/deleteArticle',
+          url: "/deleteArticle",
           data: { articleId: id },
-          method: 'post'
-        })
+          method: "post"
+        });
         if (data.success) {
-          message.success(data.msg)
-          this.getList()
+          message.success(data.msg);
+          this.getList();
         }
       },
       onCancel() {
-        message.warning('Cancel')
+        message.warning("Cancel");
       }
-    })
-  }
+    });
+  };
   // 是否显示删除按钮
   _renderDeleteBtn = articleId => {
-    if (getLocalStorage('userInfo')) {
-      let r = isPower(getLocalStorage('userInfo'))
+    if (getLocalStorage("userInfo")) {
+      let r = isPower(getLocalStorage("userInfo"));
       if (r) {
         return (
           <Icon
@@ -127,42 +127,41 @@ class Home extends React.Component {
             className={style.delete}
             onClick={() => this.deleteArticle(articleId)}
           />
-        )
+        );
       }
     }
-  }
+  };
 
   getTagList = async () => {
     const { data } = await request({
-      url: '/getTagList'
-    })
-    if (data.success) this.setState({ tags: data.data })
-  }
+      url: "/getTagList"
+    });
+    if (data.success) this.setState({ tags: data.data });
+  };
 
   onSelect = (key, e) => {
-    this.setState({ tagName: e.props.children })
-    this.getList(e.props.children)
-  }
+    this.setState({ tagName: e.props.children });
+    this.getList(e.props.children);
+  };
 
   // 是否显示写文章按钮
   _renderAddBtn = () => {
-    if (getLocalStorage('userInfo')) {
-      let r = isPower(getLocalStorage('userInfo'))
+    if (getLocalStorage("userInfo")) {
+      let r = isPower(getLocalStorage("userInfo"));
       if (r) {
         return (
           <Button
             type="primary"
             className={style.write}
             onClick={() => {
-              this.props.history.push('/AddArticle')
-            }}
-          >
+              this.props.history.push("/AddArticle");
+            }}>
             写文章
           </Button>
-        )
+        );
       }
     }
-  }
+  };
   _renderList = () => {
     const formItemLayout = {
       labelCol: {
@@ -173,7 +172,7 @@ class Home extends React.Component {
         xs: { span: 24 },
         sm: { span: 12 }
       }
-    }
+    };
     return (
       <Tabs onChange={this.changeTab} type="line">
         <TabPane tab="文章" key="1">
@@ -191,7 +190,7 @@ class Home extends React.Component {
             size="large"
             pagination={{
               onChange: page => {
-                console.log(page)
+                console.log(page);
               },
               pageSize: 5
             }}
@@ -204,12 +203,12 @@ class Home extends React.Component {
                   actions={[
                     this._renderTag(item.tagName),
                     this._renderIconText({
-                      type: 'message',
+                      type: "message",
                       text: item.commentNum,
                       info: item
                     }),
                     this._renderIconText({
-                      type: 'clock-circle',
+                      type: "clock-circle",
                       text: formatDate(item.createTime),
                       info: item
                     })
@@ -238,7 +237,7 @@ class Home extends React.Component {
             }}
             pagination={{
               onChange: page => {
-                console.log(page)
+                console.log(page);
               },
               pageSize: 4
             }}
@@ -249,12 +248,11 @@ class Home extends React.Component {
                   hoverable
                   cover={
                     <img
-                      className={style['cover-img']}
+                      className={style["cover-img"]}
                       alt={item.alt}
                       src={item.avatar}
                     />
-                  }
-                >
+                  }>
                   <Meta title={item.title} description={item.content} />
                 </Card>
               </List.Item>
@@ -262,16 +260,16 @@ class Home extends React.Component {
           />
         </TabPane>
       </Tabs>
-    )
-  }
+    );
+  };
   render() {
     return (
       <div className={style.home}>
         {this._renderList()}
         {this._renderAddBtn()}
       </div>
-    )
+    );
   }
 }
 
-export default Home
+export default Home;
