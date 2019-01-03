@@ -1,0 +1,19 @@
+.about {
+  .tips {
+    padding-top: 20px;
+    position: relative;
+    animation: mymove 5s infinite;
+  }
+}
+
+@keyframes mymove {
+  from {
+    left: 0px;
+    font-size: 14px;
+  }
+
+  to {
+    left: 520px;
+    font-size: 20px;
+  }
+}
